@@ -1,11 +1,15 @@
 import argparse
 import ping3
+from joblib import Parallel, delayed
+import multiprocessing
 from tqdm import tqdm
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--email_lst', type=str,
                         help='Path to the file with the email list')
+    parser.add_argument('--num_ping_threads', type=int, default=8,
+                        help='Number of threads that ping the domains')
     parser.add_argument('--malformed_lst', type=str, default='malformed_emails.txt',
                         help='Path to the output file with the malformed emails')
     parser.add_argument('--valid_domain_lst', type=str, default='valid_domains.txt',
@@ -20,13 +24,18 @@ def parse_args():
 def get_domain(email):
     return email[email.find('@')+1:]
 
+def tag_domain_exists(domain):
+    tag = True
+    if ping3.ping(domain) == False:
+        tag = False
+    return (domain, tag)
+
 def main(args):
     email_list = [l.strip() for l in open(args.email_lst, 'r').readlines()]
     print(f'Total emails in file:        {len(email_list)}')
 
     wellformed_emails = list()
     malformed_emails = list()
-    domain_list = list()
     for email in tqdm(email_list):
         if len(email) < 1 or \
             email.find('@') == -1 or \
@@ -36,7 +45,6 @@ def main(args):
             malformed_emails.append(email)
         else:
             wellformed_emails.append(email)
-            domain_list = get_domain(email)
 
     with open(args.malformed_lst, 'w') as malformed_file:
         malformed_file.write('\n'.join(malformed_emails))
@@ -47,18 +55,12 @@ def main(args):
     domain_set = set(map(get_domain, wellformed_emails))
     print(f'Total domains found:         {len(domain_set)}')
 
+    
+    domain_inputs = tqdm(domain_set)
+    tagged_domains = Parallel(n_jobs=args.num_ping_threads)(delayed(tag_domain_exists)(d) for d in domain_inputs)
 
-    exit
-
-    existing_domain_list = list()
-    nonexisting_domain_list = list()
-    pbar = tqdm(domain_set)
-    for domain in pbar:
-        pbar.set_description(f'Pinging {domain}')
-        if ping3.ping(domain) != False:
-            existing_domain_list.append(domain)
-        else:
-            nonexisting_domain_list.append(domain)
+    existing_domain_list = [d for d, t in tagged_domains if t==True]
+    nonexisting_domain_list = [d for d, t in tagged_domains if t==False]
     print(f'Total valid domains:          {len(existing_domain_list)}')
     print(f'Total invalid domains:        {len(nonexisting_domain_list)}')
 

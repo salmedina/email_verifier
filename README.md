@@ -4,10 +4,10 @@ This tool verifies the email domains from an email list. Purges out the emails t
 
 ### Requirements
 The pacakges used in this script are:
-```
-- ping3
-- tqdm
-```
+
+- `ping3`
+- `tqdm`
+
 
 ### Installation
 I prefer installing the software using conda to avoid any conflicts with any other installation. The steps would be the following:

@@ -22,3 +22,11 @@ pip3 install ping3
 ```
 python3 check_domains.py --email_list=<input_file>
 ```
+
+### Output
+The script outputs by default the following files as described:
+
+- `malformed_emails.txt`: email with domains that cannot be pinged
+- `valid_domains.txt`: list of domains which were pinged
+- `invalid_domains.txt`: list of domains which timedout the ping
+- `valid_emails.txt`: list of emails with an existing domain

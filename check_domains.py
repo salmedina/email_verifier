@@ -80,7 +80,7 @@ def main(args):
     
     with open(args.output_path, 'w') as emails_file:
         emails_file.write('\n'.join(existing_domain_email_list))
-        print(f'Wrote valid domain emails to {existing_domain_email_list}')
+        print(f'Wrote valid domain emails to {args.output_path}')
     
     print(f'Finished processing emails.')
     

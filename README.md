@@ -14,6 +14,7 @@ I prefer installing the software using conda to avoid any conflicts with any oth
 ```
 conda create -n emailverify python=3.7
 conda install tqdm
+conda install joblib
 pip3 install ping3
 ```
 

@@ -1,3 +1,10 @@
+'''
+This script verifies from a list of emails which emails have a valid domain by pinging into the domain.
+TODO: Add address verifier
+Author: Salvador Medina
+GitHub ID: salmedina
+'''
+
 import argparse
 import ping3
 from joblib import Parallel, delayed
